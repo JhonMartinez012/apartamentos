@@ -61,6 +61,7 @@ class ApartamentoModel extends \yii\db\ActiveRecord
             'direccion' => 'Direccion',
             'ciudad' => 'Ciudad',
             'idTarifa' => 'Tarifa',
+            'idTipoApartamento' => 'Tipo de apartamento '
         ];
     }
 

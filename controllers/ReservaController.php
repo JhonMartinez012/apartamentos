@@ -2,8 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\ApartamentoModel;
 use app\models\Reserva;
 use app\models\ReservaSearch;
+use app\models\Tarifas;
+use app\models\TiposApartamento;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -69,7 +72,58 @@ class ReservaController extends Controller
     {
         $model = new Reserva();
 
+
+
+
         if ($this->request->isPost) {
+            // arreglo de los datos enviado
+            $Data = $this->request->post();
+            $aData = $Data['Reserva'];
+
+            //Obtengo el listado de variables para insertar
+            $idApartamento = $aData['idApartamento'];
+            $idCliente = $aData['idCliente'];
+            $fecha_inicio = $aData['fecha_inicio'];
+            $fecha_fin = $aData['fecha_fin'];
+            $codReserva = $aData['codReserva'];
+            $idEstadoReserva = 1;
+
+            // obtengo el id de la tarifa para luego obtener el tipo de apartamento 
+            $aApartamento = ApartamentoModel::findOne(['idApartamento' => $idApartamento]);
+            $idTarifa = $aApartamento['idTarifa'];
+
+            // obtengo el valor de la tarifa y el tipo de apartamento
+            $aTarifa = Tarifas::findOne(['idTarifa' => $idTarifa]);
+            $valorTarifa = $aTarifa['valorTarifa'];
+            $idTipoApartamento = $aTarifa['idTipoApartamento'];
+
+            // si el apartamento es tipo corporativo idTipoApartamento = 1
+            // se realiza un recargo porcentual 
+            if ($idTipoApartamento == 1) {
+                $valorTarifaAdicional = 0.03;
+                $valorTotalPagar = $valorTarifa + ($valorTarifa * 0.03);
+                $idTasaAdicional = 1;
+            } else {
+                // Si es turistico obtengo los dias reservados para calcular el valor
+                $fecha_inicio = strtotime($fecha_inicio);
+                $fecha_fin = strtotime($fecha_fin);
+                $diferencia = $fecha_fin - $fecha_inicio;
+                $dias = floor($diferencia / (60 * 60 * 24));
+                $valorTotalPagar = $valorTarifa * $dias;
+                $valorTarifaAdicional = 150;
+                $idTasaAdicional = 2;
+            }
+
+            // guardo la info
+            $model->codReserva = $codReserva;
+            $model->fecha_inicio = $fecha_inicio;
+            $model->fecha_fin = $fecha_fin;
+            $model->valorAdicionalPagar = $valorTarifaAdicional;
+            $model->valorTotalPagar = $valorTotalPagar;
+            $model->idApartamento = $idApartamento;
+            $model->idCliente = $idCliente;
+            $model->idEstadoReserva = $idEstadoReserva;
+            $idTasaAdicional = $idTasaAdicional;
             if ($model->load($this->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'idReserva' => $model->idReserva]);
             }

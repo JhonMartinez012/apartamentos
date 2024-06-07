@@ -85,10 +85,11 @@ class ApartamentoController extends Controller
         } else {
             $model->loadDefaultValues();
         }
+
         
         return $this->render('create', [
             'model' => $model,
-            'aTiposList' => $aTiposList,
+            'aTiposList' => $aTiposList
         ]);
     }
 

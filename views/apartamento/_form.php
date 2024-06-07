@@ -28,7 +28,13 @@ use yii\helpers\ArrayHelper;
     <?php
         $Tarifas = Tarifas::find()->all();
         $aTarifasList = ArrayHelper::map($Tarifas, 'idTarifa', 'valorTarifa');
+
+        // print_r([
+        //     'aTiposList' => $aTiposList
+        // ]);
     ?>
+
+    <!-- <?= $form->field($model, 'idTipoApartamento')->dropDownList($aTiposList,['prompt' => 'Seleccione el tipo de apartamento']) ?> -->
 
     <?= $form->field($model, 'idTarifa')->dropDownList($aTarifasList,['prompt' => 'Seleccione Uno']) ?>
 
